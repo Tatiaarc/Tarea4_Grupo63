@@ -1,0 +1,138 @@
+// CONSULTAS BÁSICAS
+
+    //Insercion individual
+
+db.Subsidios.insertOne({
+"Departamento": "AMAZONAS",
+"codigo_departamento": 91,
+"municipio": "LETICIA",
+"codigo_municipio": 91001,
+"programa": "Bolsa Ordinaria",
+"anno_asignacion": 2003,
+"estado_postulacion": "Apto con subsidio vencido",
+"hogares": 8,
+"valor_asignado": 56840000})
+
+    //Insercion multiple
+
+db.Subsidios.insertMany([
+{
+  "departamento": "AMAZONAS",
+  "codigo_departamento": 91,
+  "municipio": "LETICIA",
+  "codigo_municipio": 91001,
+  "programa": "Bolsa Ordinaria",
+  "anno_asignacion": 2003,
+  "estado_postulacion": "Apto con subsidio vencido",
+  "hogares": 8,
+  "valor_asignado": 56840000
+},
+{
+  "departamento": "AMAZONAS",
+  "codigo_departamento": 91,
+  "municipio": "LETICIA",
+  "codigo_municipio": 91001,
+  "programa": "Bolsa Esfuerzo Territorial",
+  "anno_asignacion": 2005,
+  "estado_postulacion": "Restitucion SFV por Vencimiento Vigencia",
+  "hogares": 4,
+  "valor_asignado": 30072000
+},
+{
+  "departamento": "AMAZONAS",
+  "codigo_departamento": 91,
+  "municipio": "LETICIA",
+  "codigo_municipio": 91001,
+  "programa": "Programa Vivienda Gratuita Fase I",
+  "anno_asignacion": 2019,
+  "estado_postulacion": "Asignados",
+  "hogares": 1,
+  "valor_asignado": 55957440
+}]
+
+    //Seleccion
+
+db.Subsidios.find().limit(10)
+
+db.Subsidios.find({ _id: ObjectId("69237f1f5eabf2a55a2daaea")})
+
+    //Actualizacion
+
+db.Subsidios.updateOne(
+  { _id: ObjectId("6923879854ef7a0dfc63b112") },
+  { $set: { estado_postulacion: "Asignados" } }
+)
+
+db.Subsidios.updateMany(
+  { Municipio: "LETICIA", 'Anno de Asignacion': 2005 },
+  { $set: { estado_postulacion: "Revisar" } }
+)
+
+db.Subsidios.updateMany(
+  { Programa: "Sin clasificaci??n"},
+  { $set: { Programa: "Sin clasificacion" } }
+)
+
+    //Eliminacion
+
+db.Subsidios.deleteOne({ _id: ObjectId("6923879854ef7a0dfc63b112")})
+
+db.Subsidios.deleteMany(
+  { Programa: "Sin clasificacion", 'Anno de Asignacion': 2003 }
+)
+
+//CONSULTAS CON FILTROS Y OPERADORES
+
+    //Mayor que
+
+db.Subsidios.find({ valor_asignado: { $gt: 50000000 } })
+
+    //Uso de AND
+
+db.Subsidios.find({ Programa: "MI CASA YA", Departamento: 'ANTIOQUIA' })
+
+    //Uso de OR
+db.Subsidios.find({
+  $or: [
+    { Programa: 'Casa Digna Vida Digna' },
+    { Programa: 'TUTELA' }
+  ]
+}).limit(10)
+
+
+//CONSULTAS DE AGREGACIÓN
+
+    //Conteo
+db.Subsidios.countDocuments()
+
+    //Sumatoria
+db.Subsidios.aggregate([
+  {
+    $group: {
+      _id: "$Departamento",     
+      Documentos_por_Departamento: { $sum: 1 } 
+    }
+  }
+])
+
+db.Subsidios.aggregate([
+  {
+    $group: {
+      _id: "$Programa",
+      total_valor_asignado: { $sum: "$ Valor Asignado " }
+    }
+  },
+  { $sort: { total_valor_asignado: -1 } }
+])
+
+    //Promedio
+
+db.Subsidios.aggregate([
+  {
+    $group: {
+      _id: "$Anno de Asignacion",         
+      promedio_valor_asignado: { $avg: "$ Valor Asignado " } 
+    }
+  },
+  { $sort: { _id: 1 } } 
+])
