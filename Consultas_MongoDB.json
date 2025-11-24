@@ -105,7 +105,7 @@ db.Subsidios.find({
     //Conteo
 db.Subsidios.countDocuments()
 
-    //Sumatoria
+//Sumatoria
 db.Subsidios.aggregate([
   {
     $group: {
@@ -134,5 +134,5 @@ db.Subsidios.aggregate([
       promedio_valor_asignado: { $avg: "$ Valor Asignado " } 
     }
   },
-  { $sort: { _id: 1 } } 
+  { $sort: { promedio_valor_asignado: -1 } } 
 ])
